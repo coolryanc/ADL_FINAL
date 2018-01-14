@@ -102,12 +102,12 @@ if __name__ == "__main__":
 
 	logging.info("compiling model...")
 	optimizer = Adam(lr=LEARNING_RATE)
-	model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=['categorical_accuracy'])
+	model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=['accuracy'])
 
 	logging.info("training started...")
-	TRAIN_DATA = np.array(TRAIN_DATA)
+	TRAIN_DATA = np.array(TRAIN_DATA, dtype="float") / 255.0
 	TRAIN_LABEL = np_utils.to_categorical(TRAIN_LABEL)
-	model.fit(TRAIN_DATA, TRAIN_LABEL, epochs=EPOCH, batch_size=BATCH_SIZE, verbose=2, validation_split=0.2, shuffle=False)
+	model.fit(TRAIN_DATA, TRAIN_LABEL, epochs=EPOCH, batch_size=BATCH_SIZE, verbose=2, validation_split=0.15, shuffle=False)
 
 	logging.info("training completed.")
 	model.save("main_model.%s.h5" % (str(time.time())))
