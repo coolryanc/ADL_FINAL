@@ -199,7 +199,7 @@ def test(model, test_data, test_label, test):
     return cvscores
 
 if __name__ == '__main__': 
-    print "get data"
+    print("get data")
     data = get_data()
     cvscores = []
     model = None
