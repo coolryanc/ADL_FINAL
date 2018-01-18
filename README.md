@@ -54,6 +54,9 @@
 
 ### Personal Model 個人模型
 
+執行下面這一個指令就會 train + test 個人模型，因為 personal model train 很快就可以達到至少 97% 左右的 accuracy 所以我們並沒有把 testing 分開寫。
+也就是 train 完就開始 testing！
+
 ```sh
 # please use python3 if your default python is of version 2
 python PersonalModel.py <person>
