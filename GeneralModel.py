@@ -67,7 +67,7 @@ def reshapeTo60and160(dataset):
         images.append(image.reshape(60, 160))
     return np.array(images, dtype=float)
 
-def sample_model(num_of_class):
+def sample_model():
     #initial model
     model = Sequential()
     #add dropout to reduce overfitting
@@ -85,41 +85,82 @@ def sample_model(num_of_class):
     model.add(Dense(600, activation='relu'))
     model.add(Dropout(0.1))
     model.add(Dense(200, activation='relu'))
-    model.add(Dense(num_of_class, kernel_regularizer=regularizers.l2(0.01),
+    model.add(Dense(num_classes, kernel_regularizer=regularizers.l2(0.01),
                     activity_regularizer=regularizers.l1(0.01), 
                     activation='softmax'))
     return model
+#concatenate data
+path = os.getcwd()
+data = []
 
-def get_data():
-    #concatenate data
-    path = os.getcwd()
-    data = []
-    for i in range(12):
-        pData = []
-        for j in range(10):
-            if os.path.isfile(path+"/../data/generalData/part%d/%ddata.csv" %(i+1,j)): 
-                tmp = pd.read_csv(path+"/../data/generalData/part%d/%ddata.csv" %(i+1,j))
-                if len(tmp) > 100:
-                    pData.append(tmp[:100])
-                else:
-                    pData.append(tmp)
+for i in range(12):
+    pData = []
+    for j in range(10):
+        if os.path.isfile(path+"/data/generalData/part%d/%ddata.csv" %(i+1,j)): 
+            tmp = pd.read_csv(path+"/data/generalData/part%d/%ddata.csv" %(i+1,j))
+            if len(tmp) > 100:
+                pData.append(tmp[:100])
             else:
-                pData.append(None)
-        data.append(pData) 
-    return data
+                pData.append(tmp)
+        else:
+            pData.append(None)
+    data.append(pData) 
 
-def preprocess_data(data, test_id):
-    test = None
-    train = None
-    TrainSize = 0
-    TestSize = 0
+# for i in range(len(data)):
+#     ratio = float(size)/len(data[i])
+#     if ratio != 1:
+#         exData, sData = train_test_split(data[i], test_size = ratio)
+#         train, tmp_test = train_test_split(sData, test_size = 0.2)
+#         #train, tmp_test = train_test_split(data[i], test_size = 0.2)
+#     else: 
+#         train, tmp_test = train_test_split(data[i], test_size = 0.2)
+#     #split each expression into k-fold data
+#     trainSplit = []
+#     k = 10
+#     for j in range(k):
+#         if j == k-1:
+#             trainSplit.append(train)
+#             break
+#         rTrain, sTrain = train_test_split(train, test_size = 1./(k-j))
+#         trainSplit.append(sTrain)
+#         train = rTrain
+#     trainList.append(trainSplit)
+#     frames = [test, tmp_test]
+#     test = pd.concat(frames)
+# test_images = reshapeTo60and160(test)
+
+# #reshape to [# of samples][width][height][pixels] for tensorflow-keras input format
+# #train_images = train_images.reshape(train_images.shape[0], 60, 160, 1).astype('float32')
+# test_images = test_images.reshape(test_images.shape[0], 60, 160, 1).astype('float32')
+
+# #check input format
+# # train_images.shape
+
+# #normilize the data
+# #train_images = train_images/255
+# test_images = test_images/255.
+
+# #One hot encode outputs: change target(emotion) values to input format with one-hot encode
+# #train_targets = np_utils.to_categorical(train.expression.values)
+# test_targets = np_utils.to_categorical(test.expression.values)
+
+# set number of prediction classes
+# num_classes = test_targets.shape[1]
+#10-fold cross validation
+cvscores = []
+test = None
+train = None
+model = None
+TrainSize = 0
+TestSize = 0
+for i in range(1):
     # get the size for each expression
     tmpTrainSize, tmpTestSize = 0, 0
     for exp in range(10):
         tmpTrainSize = 0
         tmpTestSize = 0
         for j in range(12):
-            if test_id == j and data[j][exp] is not None:
+            if i==j and data[j][exp] is not None:
                 tmpTestSize = len(data[j][exp])
             elif data[j][exp] is not None :
                 tmpTrainSize += len(data[j][exp])
@@ -135,7 +176,7 @@ def preprocess_data(data, test_id):
     for exp in range(10):
         expTrain = None
         for j in range(12):
-            if test_id == j and data[j][exp] is not None:
+            if i == j and data[j][exp] is not None:
                 # concatenate testData
                 ratio = float(TestSize)/len(data[j][exp])
                 if ratio < 1:
@@ -157,6 +198,24 @@ def preprocess_data(data, test_id):
             frames = [train,expTrain]
         train = pd.concat(frames)
 
+
+    # #concatenate 9 train and 1 validation
+    # train = None
+    # val = None
+    # for exp in range(11): 
+    #     strain = None 
+    #     sval = None  
+    #     for j in range(k):
+    #         if j == i:
+    #             sval = trainList[exp][j]
+    #             continue
+    #         frames = [strain, trainList[exp][j]]
+    #         strain = pd.concat(frames)
+    #     frames = [train, strain]
+    #     train = pd.concat(frames)
+    #     frames = [val, sval]
+    #     val = pd.concat(frames)
+
     test_images = reshapeTo60and160(test)
     train_images = reshapeTo60and160(train)
     #reshape to [# of samples][width][height][pixels] for tensorflow-keras input format
@@ -170,25 +229,22 @@ def preprocess_data(data, test_id):
     train_targets = np_utils.to_categorical(train.expression.values)
     #set number of prediction classes
     num_classes = test_targets.shape[1]
-    return train_images, train_targets, test_images, test_targets, test, num_classes
 
-def train(model, train_data, train_label, test_data, test_label):
-
-    model.summary()
-    filename = path+"../data/generalData/general_Model.hdf5"
+    model = sample_model()
+    # model.summary()
+    # sys.exit(-1)
+    filename = path+"/data/generalData/general_Model.hdf5"
     check_point = ModelCheckpoint(filename, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
     callbacks_list = [check_point]
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    history = model.fit(train_data, train_label, validation_data=(test_data, test_label), epochs=10, batch_size=80, callbacks=callbacks_list, verbose=2)
-
-def test(model, test_data, test_label, test):
-
-    scores = model.evaluate(test_data, test_label, verbose=0)
+    history = model.fit(train_images, train_targets, validation_data=(test_images, test_targets), 
+          epochs=10, batch_size=80, callbacks=callbacks_list, verbose=2)
+    scores = model.evaluate(test_images, test_targets, verbose=0)
     print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
     cvscores.append(scores[1] * 100)
     #plot CM
     #print(test.expression.values)
-    Saved_prediction = model.predict_classes(test_data, verbose=0)
+    Saved_prediction = model.predict_classes(test_images, verbose=0)
     True_prediction = test.expression.values
     cm = confusion_matrix(True_prediction, Saved_prediction)
 
@@ -196,23 +252,20 @@ def test(model, test_data, test_label, test):
     plot_confusion_matrix(cm, classes=class_names, normalize=True,
                           title='Confusion Matrix for Test Dataset')
     plt.show()
-    return cvscores
-
-if __name__ == '__main__': 
-    print("get data")
-    data = get_data()
-    cvscores = []
-    model = None
-    for test_id in range(1):
-        train_data, train_label, test_data, test_label, test, num_of_class = preprocess_data(data, test_id)
-        model = sample_model(num_of_class)
-        train(model, train_data, train_label, test_data, test_label)
-        cvscores = test(model, test_data, test_label, test)
-    
-    print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
 
 
+print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
 
+# #plot CM
+# print(test.expression.values)
+# Saved_prediction = model.predict_classes(test_images, verbose=0)
+# True_prediction = test.expression.values
+# cm = confusion_matrix(True_prediction, Saved_prediction)
+
+# class_names = ['blink_both', 'blink_left', 'blink_right', 'squint', 'squint_left', 'squint_right', 'frown', 'raise_eyebrow', 'enlarge',  'smile_both', 'others']
+# plot_confusion_matrix(cm, classes=class_names, normalize=True,
+#                       title='Confusion Matrix for Test Dataset')
+# plt.show()
 
 
 
