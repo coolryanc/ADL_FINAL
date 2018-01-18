@@ -20,11 +20,20 @@
 
 ### Required Packages 所需套件
 
-1. `keras`
-2. `sklearn`
-3. `PIL`
-4. `pandas`
-5. `matplotlib`
+1. `Keras (2.1.2)`
+2. `scikit-learn (0.19.1)`
+3. `scikit-image (0.13.1)`
+4. `scipy (1.0.0)`
+5. `sklearn (0.0)`
+6. `tensorflow (1.4.1)`
+7. `Pillow (4.3.0)`
+8. `pandas (0.22.0)`
+9. `matplotlib (2.1.1)`
+10. `h5py (2.7.1)`
+11. `numpy (1.13.3)`
+12. `opencv-python (3.3.0.10)`
+
+> These are extracted from: `$pip list`.
 
 ## Data 所需資料
 
