@@ -12,4 +12,4 @@ test_images = np.load(test_data_images_path)
 test_targets = np.load(test_data_targets_path)
 scores = model.evaluate(test_images, test_targets, verbose=0)
 
-print(scores)
+print("accuracy:", scores[1])
