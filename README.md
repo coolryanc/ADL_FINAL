@@ -37,7 +37,7 @@
 
 ## Data 所需資料
 
-1. 請至 [TODO: link](https://www.google.com.tw) 下載並解壓縮
+1. 請至 [Google Drive: data.zip](https://drive.google.com/file/d/1rd4MYuuXsEKEWLZ6zU8OZ5QHemvzAsRw/view?usp=sharing) 下載並解壓縮
 2. 將 `data/` 資料夾放至本 repo 最外層, i.e., 與這個 `README.md` 同層
 
 > :warning: 原本 repo 裡面的 `data/` 可以直接覆蓋掉沒有關係的！
@@ -85,11 +85,19 @@ python PersonalModel.py <person>
 
 ### General Model 一般模型
 
+下面這個指令會 train 一個 general model (然後存在 `data/generalData/general_Model.hdf5`)。
 ```sh
 # please use python3 if your default python is of version 2
 python GeneralModel.py
 ```
 
+若只想要跑 General Model 的 testing 的話，我們已經有 train 一個，同樣在 `data/generalData/general_Model.hdf5`。
+只需要跑:
+```sh
+# please use python3 if your default python is of version 2
+python GeneralModelTest.py
+```
+(相關路徑都已經寫在 source code 裡面)
 
 ## Model Structure 模型架構
 
