@@ -21,7 +21,7 @@ import random
 
 def parse():
 	parser = argparse.ArgumentParser(description = "CNN Network")
-	parser.add_argument('--epochs', default = 10, type = int)
+	parser.add_argument('--epochs', default = 6, type = int)
 	parser.add_argument('--batch_size', default=128, type=int)
 	parser.add_argument('--lr', default=0.0005, type=float,
 						help="Initial learning rate")
@@ -94,13 +94,13 @@ if __name__ == '__main__':
 	Y_train = np_utils.to_categorical(Y_train, num_classes=num_classes)
 	Y_valid = np_utils.to_categorical(Y_valid, num_classes=num_classes)
 
-	train_data_gen = ImageDataGenerator(
-						rotation_range=30,
-						width_shift_range=0.2,
-						height_shift_range=0.2,
-						zoom_range=[0.8, 1.2],
-						shear_range=0.2,
-						horizontal_flip=True)
+	# train_data_gen = ImageDataGenerator(
+	# 					rotation_range=30,
+	# 					width_shift_range=0.2,
+	# 					height_shift_range=0.2,
+	# 					zoom_range=[0.8, 1.2],
+	# 					shear_range=0.2,
+	# 					horizontal_flip=True)
 
 	model = Sequential()
 	model.add(Convolution2D(64, (3, 3), padding='same',
@@ -155,13 +155,15 @@ if __name__ == '__main__':
 	callbacks = []
 	callbacks.append(ModelCheckpoint('./model/model-{epoch:05d}-{val_acc:.5f}.h5', monitor='val_acc', save_best_only=True, period=1))
 
-	model.fit_generator(
-			train_data_gen.flow(X_train, Y_train, batch_size=args.batch_size),
-			steps_per_epoch=5*len(X_train)//args.batch_size,
-			epochs=args.epochs,
-			validation_data=(X_valid, Y_valid),
-			callbacks=callbacks
-			)
+	model.fit(X_train, Y_train, batch_size=args.batch_size, epochs=args.epochs, validation_data=(X_valid, Y_valid))
+
+	# model.fit_generator(
+	# 		train_data_gen.flow(X_train, Y_train, batch_size=args.batch_size),
+	# 		steps_per_epoch=5*len(X_train)//args.batch_size,
+	# 		epochs=args.epochs,
+	# 		validation_data=(X_valid, Y_valid),
+	# 		callbacks=callbacks
+	# 		)
 
 	model.save(args.save_dir + '/cnn.h5')
 
